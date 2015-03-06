@@ -410,13 +410,13 @@
 		backView.autoresizingMask = UIViewAutoresizingNone;
 		backView.backgroundColor = [UIColor whiteColor];
 
-#if (READER_SHOW_SHADOWS == TRUE) // Option
-
-		backView.layer.shadowOffset = CGSizeMake(0.0f, 1.0f);
-		backView.layer.shadowRadius = 3.0f; backView.layer.shadowOpacity = 1.0f;
-		backView.layer.shadowPath = [UIBezierPath bezierPathWithRect:backView.bounds].CGPath;
-
-#endif // end of READER_SHOW_SHADOWS Option
+        if ([[ReaderConstants sharedReaderConstants] showShadows]){ // Option
+            
+            backView.layer.shadowOffset = CGSizeMake(0.0f, 1.0f);
+            backView.layer.shadowRadius = 3.0f; backView.layer.shadowOpacity = 1.0f;
+            backView.layer.shadowPath = [UIBezierPath bezierPathWithRect:backView.bounds].CGPath;
+            
+        } // end of showShadows Option
 
 		[self insertSubview:backView belowSubview:textLabel];
 
@@ -470,11 +470,11 @@
 
 	tintView.frame = imageView.bounds; backView.bounds = viewRect; backView.center = location;
 
-#if (READER_SHOW_SHADOWS == TRUE) // Option
-
-	backView.layer.shadowPath = [UIBezierPath bezierPathWithRect:backView.bounds].CGPath;
-
-#endif // end of READER_SHOW_SHADOWS Option
+    if ([[ReaderConstants sharedReaderConstants] showShadows]){ // Option
+        
+        backView.layer.shadowPath = [UIBezierPath bezierPathWithRect:backView.bounds].CGPath;
+        
+    } // end of showShadows Option
 }
 
 - (void)reuse
@@ -489,11 +489,11 @@
 
 	tintView.hidden = YES; tintView.frame = imageView.bounds; backView.frame = defaultRect;
 
-#if (READER_SHOW_SHADOWS == TRUE) // Option
-
-	backView.layer.shadowPath = [UIBezierPath bezierPathWithRect:backView.bounds].CGPath;
-
-#endif // end of READER_SHOW_SHADOWS Option
+    if ([[ReaderConstants sharedReaderConstants] showShadows]){ // Option
+        
+        backView.layer.shadowPath = [UIBezierPath bezierPathWithRect:backView.bounds].CGPath;
+        
+    } // end of showShadows Option
 }
 
 - (void)showBookmark:(BOOL)show

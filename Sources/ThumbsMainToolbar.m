@@ -24,9 +24,13 @@
 //
 
 #import "ReaderConstants.h"
+#import "ReaderColors.h"
 #import "ThumbsMainToolbar.h"
 
-@implementation ThumbsMainToolbar
+@implementation ThumbsMainToolbar{
+    UIImage *buttonH;
+    UIImage *buttonN;
+}
 
 #pragma mark - Constants
 
@@ -62,12 +66,10 @@
 	{
 		CGFloat viewWidth = self.bounds.size.width; // Toolbar view width
 
-#if (READER_FLAT_UI == TRUE) // Option
-		UIImage *buttonH = nil; UIImage *buttonN = nil;
-#else
-		UIImage *buttonH = [[UIImage imageNamed:@"Reader-Button-H"] stretchableImageWithLeftCapWidth:5 topCapHeight:0];
-		UIImage *buttonN = [[UIImage imageNamed:@"Reader-Button-N"] stretchableImageWithLeftCapWidth:5 topCapHeight:0];
-#endif // end of READER_FLAT_UI Option
+        if (![[ReaderConstants sharedReaderConstants] flatUI]) { // Option
+            buttonH = [[UIImage imageNamed:@"Reader-Button-H"] stretchableImageWithLeftCapWidth:5 topCapHeight:0];
+            buttonN = [[UIImage imageNamed:@"Reader-Button-N"] stretchableImageWithLeftCapWidth:5 topCapHeight:0];
+        } // end of flatUI Option
 
 		BOOL largeDevice = ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad);
 
@@ -98,32 +100,32 @@
 
 		titleX += (doneButtonWidth + buttonSpacing); titleWidth -= (doneButtonWidth + buttonSpacing);
 
-#if (READER_BOOKMARKS == TRUE) // Option
-
-		CGFloat showControlX = (viewWidth - (SHOW_CONTROL_WIDTH + buttonSpacing));
-
-		UIImage *thumbsImage = [UIImage imageNamed:@"Reader-Thumbs"];
-		UIImage *bookmarkImage = [UIImage imageNamed:@"Reader-Mark-Y"];
-		NSArray *buttonItems = [NSArray arrayWithObjects:thumbsImage, bookmarkImage, nil];
-
-		BOOL useTint = [self respondsToSelector:@selector(tintColor)]; // iOS 7 and up
-
-		UISegmentedControl *showControl = [[UISegmentedControl alloc] initWithItems:buttonItems];
-		showControl.frame = CGRectMake(showControlX, BUTTON_Y, SHOW_CONTROL_WIDTH, BUTTON_HEIGHT);
-		showControl.tintColor = (useTint ? [UIColor blackColor] : [UIColor colorWithWhite:0.8f alpha:1.0f]);
-		showControl.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
-		showControl.segmentedControlStyle = UISegmentedControlStyleBar;
-		showControl.selectedSegmentIndex = 0; // Default segment index
-		//showControl.backgroundColor = [UIColor grayColor];
-		showControl.exclusiveTouch = YES;
-
-		[showControl addTarget:self action:@selector(showControlTapped:) forControlEvents:UIControlEventValueChanged];
-
-		[self addSubview:showControl];
-
-		titleWidth -= (SHOW_CONTROL_WIDTH + buttonSpacing);
-
-#endif // end of READER_BOOKMARKS Option
+        if ([[ReaderConstants sharedReaderConstants] bookmarks]) { // Option
+            
+            CGFloat showControlX = (viewWidth - (SHOW_CONTROL_WIDTH + buttonSpacing));
+            
+            UIImage *thumbsImage = [UIImage imageNamed:@"Reader-Thumbs"];
+            UIImage *bookmarkImage = [UIImage imageNamed:@"Reader-Mark-Y"];
+            NSArray *buttonItems = [NSArray arrayWithObjects:thumbsImage, bookmarkImage, nil];
+            
+            BOOL useTint = [self respondsToSelector:@selector(tintColor)]; // iOS 7 and up
+            
+            UISegmentedControl *showControl = [[UISegmentedControl alloc] initWithItems:buttonItems];
+            showControl.frame = CGRectMake(showControlX, BUTTON_Y, SHOW_CONTROL_WIDTH, BUTTON_HEIGHT);
+            showControl.tintColor = (useTint ? [UIColor blackColor] : [UIColor colorWithWhite:0.8f alpha:1.0f]);
+            showControl.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
+            showControl.segmentedControlStyle = UISegmentedControlStyleBar;
+            showControl.selectedSegmentIndex = 0; // Default segment index
+            //showControl.backgroundColor = [UIColor grayColor];
+            showControl.exclusiveTouch = YES;
+            
+            [showControl addTarget:self action:@selector(showControlTapped:) forControlEvents:UIControlEventValueChanged];
+            
+            [self addSubview:showControl];
+            
+            titleWidth -= (SHOW_CONTROL_WIDTH + buttonSpacing);
+            
+        } // end of bookmarks Option
 
 		if (largeDevice == YES) // Show document filename in toolbar
 		{
@@ -135,15 +137,16 @@
 			titleLabel.font = [UIFont systemFontOfSize:TITLE_FONT_SIZE];
 			titleLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 			titleLabel.baselineAdjustment = UIBaselineAdjustmentAlignCenters;
-			titleLabel.textColor = [UIColor colorWithWhite:0.0f alpha:1.0f];
+			titleLabel.textColor = [[ReaderColors sharedReaderColors] textColor];
 			titleLabel.backgroundColor = [UIColor clearColor];
 			titleLabel.adjustsFontSizeToFitWidth = YES;
 			titleLabel.minimumScaleFactor = 0.75f;
 			titleLabel.text = title;
-#if (READER_FLAT_UI == FALSE) // Option
-			titleLabel.shadowColor = [UIColor colorWithWhite:0.65f alpha:1.0f];
-			titleLabel.shadowOffset = CGSizeMake(0.0f, 1.0f);
-#endif // end of READER_FLAT_UI Option
+            
+            if (![[ReaderConstants sharedReaderConstants] flatUI]) { // Option
+                titleLabel.shadowColor = [UIColor colorWithWhite:0.65f alpha:1.0f];
+                titleLabel.shadowOffset = CGSizeMake(0.0f, 1.0f);
+            } // end of flatUI Option
 
 			[self addSubview:titleLabel];
 		}
