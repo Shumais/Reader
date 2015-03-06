@@ -87,13 +87,16 @@
 - (void)updateContentSize:(UIScrollView *)scrollView
 {
 
-#if (READER_VERTICAL_LAYOUT == TRUE) // Option
-    CGFloat contentHeight = scrollView.bounds.size.height * maximumPage; // Height
-    CGFloat contentWidth = scrollView.bounds.size.width;
-#else
-    CGFloat contentHeight = scrollView.bounds.size.height; // Height
-    CGFloat contentWidth = (scrollView.bounds.size.width * maximumPage);
-#endif // end of READER_VERTICAL_LAYOUT Option
+    CGFloat contentHeight;
+    CGFloat contentWidth;
+    if ([[ReaderConstants sharedReaderConstants] verticalLayout]) { // Option
+        contentHeight = scrollView.bounds.size.height * maximumPage; // Height
+        contentWidth = scrollView.bounds.size.width;
+    }
+    else {
+        contentHeight = scrollView.bounds.size.height; // Height
+        contentWidth = (scrollView.bounds.size.width * maximumPage);
+    }
     
 	scrollView.contentSize = CGSizeMake(contentWidth, contentHeight);
 }
@@ -132,13 +135,13 @@
 - (void)addContentView:(UIScrollView *)scrollView page:(NSInteger)page
 {
 	CGRect viewRect = CGRectZero; viewRect.size = scrollView.bounds.size;
-
-#if (READER_VERTICAL_LAYOUT == TRUE) // Option
-    viewRect.origin.y = (viewRect.size.height * (page - 1)); viewRect = CGRectInset(viewRect, scrollViewOutset, 0.0f);
-#else
-    viewRect.origin.x = (viewRect.size.width * (page - 1)); viewRect = CGRectInset(viewRect, scrollViewOutset, 0.0f);
-#endif // end of READER_VERTICAL_LAYOUT Option
     
+    if ([[ReaderConstants sharedReaderConstants] verticalLayout]) { // Option
+        viewRect.origin.y = (viewRect.size.height * (page - 1)); viewRect = CGRectInset(viewRect, scrollViewOutset, 0.0f);
+    }
+    else {
+        viewRect.origin.x = (viewRect.size.width * (page - 1)); viewRect = CGRectInset(viewRect, scrollViewOutset, 0.0f);
+    }
 
 	NSURL *fileURL = document.fileURL; NSString *phrase = document.password; NSString *guid = document.guid; // Document properties
 
@@ -155,23 +158,24 @@
     NSInteger pageB; // Pages
     NSInteger pageA; // Add extra pages
     
-#if (READER_VERTICAL_LAYOUT == TRUE) // Option
-    CGFloat viewHeight = scrollView.bounds.size.height; // View height
-    
-    CGFloat contentOffsetY = scrollView.contentOffset.y; // Content offset Y
-    
-    pageB = ((contentOffsetY + viewHeight - 1.0f) / viewHeight);
-    
-    pageA = (contentOffsetY / viewHeight); pageB += 2;
-#else
-    CGFloat viewWidth = scrollView.bounds.size.width; // View width
-    
-    CGFloat contentOffsetX = scrollView.contentOffset.x; // Content offset X
-    
-    pageB = ((contentOffsetX + viewWidth - 1.0f) / viewWidth);
-    
-    pageA = (contentOffsetX / viewWidth); pageB += 2;
-#endif // end of READER_VERTICAL_LAYOUT Option
+    if ([[ReaderConstants sharedReaderConstants] verticalLayout]) { // Option
+        CGFloat viewHeight = scrollView.bounds.size.height; // View height
+        
+        CGFloat contentOffsetY = scrollView.contentOffset.y; // Content offset Y
+        
+        pageB = ((contentOffsetY + viewHeight - 1.0f) / viewHeight);
+        
+        pageA = (contentOffsetY / viewHeight); pageB += 2;
+    }
+    else {
+        CGFloat viewWidth = scrollView.bounds.size.width; // View width
+        
+        CGFloat contentOffsetX = scrollView.contentOffset.x; // Content offset X
+        
+        pageB = ((contentOffsetX + viewWidth - 1.0f) / viewWidth);
+        
+        pageA = (contentOffsetX / viewWidth); pageB += 2;
+    }
     
 	if (pageA < minimumPage) pageA = minimumPage; if (pageB > maximumPage) pageB = maximumPage;
 
@@ -227,21 +231,21 @@
 
 - (void)handleScrollViewDidEnd:(UIScrollView *)scrollView
 {
-
-    
-#if (READER_VERTICAL_LAYOUT == TRUE) // Option
-    CGFloat viewHeight = scrollView.bounds.size.height; // Scroll view width
-    
-    CGFloat contentOffsetY = scrollView.contentOffset.y; // Content offset Y
-    
-    NSInteger page = (contentOffsetY / viewHeight); page++; // Page number
-#else
-    CGFloat viewWidth = scrollView.bounds.size.width; // Scroll view width
-    
-    CGFloat contentOffsetX = scrollView.contentOffset.x; // Content offset X
-    
-    NSInteger page = (contentOffsetX / viewWidth); page++; // Page number
-#endif // end of READER_VERTICAL_LAYOUT Option
+    NSInteger page;
+    if ([[ReaderConstants sharedReaderConstants] verticalLayout]) { // Option
+        CGFloat viewHeight = scrollView.bounds.size.height; // Scroll view width
+        
+        CGFloat contentOffsetY = scrollView.contentOffset.y; // Content offset Y
+        
+        page = (contentOffsetY / viewHeight); page++; // Page number
+    }
+    else {
+        CGFloat viewWidth = scrollView.bounds.size.width; // Scroll view width
+        
+        CGFloat contentOffsetX = scrollView.contentOffset.x; // Content offset X
+        
+        page = (contentOffsetX / viewWidth); page++; // Page number
+    }
     
 	if (page != currentPage) // Only if on different page
 	{
@@ -268,12 +272,13 @@
 
 		currentPage = page; document.pageNumber = [NSNumber numberWithInteger:page];
 
-		
-#if (READER_VERTICAL_LAYOUT == TRUE) // Option
-        CGPoint contentOffset = CGPointMake(0.0f, (theScrollView.bounds.size.height * (page - 1)));
-#else
-        CGPoint contentOffset = CGPointMake((theScrollView.bounds.size.width * (page - 1)), 0.0f);
-#endif // end of READER_VERTICAL_LAYOUT Option
+        CGPoint contentOffset;
+        if ([[ReaderConstants sharedReaderConstants] verticalLayout]) { // Option
+            contentOffset = CGPointMake(0.0f, (theScrollView.bounds.size.height * (page - 1)));
+        }
+        else {
+            contentOffset = CGPointMake((theScrollView.bounds.size.width * (page - 1)), 0.0f);
+        }
         
 		if (CGPointEqualToPoint(theScrollView.contentOffset, contentOffset) == true)
 			[self layoutContentViews:theScrollView];

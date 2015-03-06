@@ -89,4 +89,10 @@
  */
 @property (nonatomic, assign) BOOL bookmarks;
 
+/**
+ *  If TRUE, pages are layedout vertically.
+ *
+ *  Default NO.
+ */
+@property (nonatomic, assign) BOOL verticalLayout;
 @end
